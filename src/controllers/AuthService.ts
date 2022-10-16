@@ -67,7 +67,7 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const confirmPassword: string = req.body.confirm_password || "";
 
   if (!email.match(emailRegex)) {
-    return res.status(300).send({ errors: ["O e-mail informado está inválido"] });
+    return res.status(400).send({ errors: ["O e-mail informado está inválido"] });
   }
 
   if (!password.match(passwordRegex)) {
@@ -81,14 +81,14 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const salt = bcryptjs.genSaltSync();
   const passwordHash: string = bcryptjs.hashSync(password, salt);
   if (!bcryptjs.compareSync(confirmPassword, passwordHash)) {
-    return res.status(500).send({ errors: ["Senhas não conferem."] });
+    return res.status(400).send({ errors: ["Senhas não conferem."] });
   }
 
   User.findOne({ email }, (err: any, user: IUser) => {
     if (err) {
       return sendErrorsFromDB(res, err);
     } else if (user) {
-      return res.status(600).send({ errors: ["Usuário já cadastrado."] });
+      return res.status(400).send({ errors: ["Usuário já cadastrado."] });
     } else {
       const newUser = new User({ email, password: passwordHash, uid });
       newUser.save((err) => {
@@ -108,7 +108,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
 
     res.json(user);
   } catch (error) {
-    res.status(900).json({
+    res.status(404).json({
       Error: "Não foi possível trazer o registro específico solicitado!",
     });
     next();
