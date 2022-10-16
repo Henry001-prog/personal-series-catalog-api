@@ -34,8 +34,7 @@ const SeriesController = {
   ): Promise<void> {
     try {
       const { page = 1 }: any = req.query;
-      const series = await Series.paginate({}, { page, limit: 10 });
-
+      const series = await Series.find({ uid: req.params.uid });
       res.json(series);
     } catch (error) {
       res

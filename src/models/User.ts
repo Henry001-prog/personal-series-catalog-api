@@ -1,26 +1,33 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 interface IUser {
-    name: string;
-    email: string;
-    password: string;
-  }
+  // name: string;
+  uid: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+  token: string;
+}
 
 const userSchema = new Schema<IUser>({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        min: 8, 
-        max: 20,
-        required: true
-    }
+  uid: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    min: 8,
+    max: 20,
+    required: true,
+  },
+  token: {
+    type: String,
+    default: "",
+  },
 });
 
-export const User = model('User', userSchema);
+export const User = model("User", userSchema);

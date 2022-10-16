@@ -7,7 +7,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     next();
   } else {
     const token =
-      req.body.token || req.query.token || req.headers["authorization"];
+      req.body.token || req.query.token || req.headers["authorization"] || req.params.token;
 
     if (!token) {
       return res.status(403).send({ errors: ["No token provided."] });
