@@ -6,9 +6,9 @@ interface ISeries extends Document {
   series: {
     _id: Schema.Types.ObjectId;
     title: string;
+    img: string;
     gender: string;
     rate: number;
-    img64: string;
     description: string;
     createdAt: Number;
   };
@@ -28,6 +28,10 @@ const SeriesSchema = new Schema<ISeries>({
       auto: true,
     },
     title: {
+      type: String,
+      required: true,
+    },
+    img: {
       type: String,
       required: true,
     },

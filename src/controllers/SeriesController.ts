@@ -1,6 +1,12 @@
 import { model, UpdateQuery, PaginateModel } from "mongoose";
 import { Request, Response, NextFunction } from "express";
 import { Series } from "../models/Series";
+import { Image } from '../models/Image';
+import multer from "multer";
+import { multerConfig } from "../config/multer";
+import fs from 'fs';
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 interface ISeries {
   title: string;
@@ -27,6 +33,41 @@ const SeriesController = {
     }
   },
 
+  async createSeriesImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const { originalname: name, size, filename: key, path, buffer, mimetype } = (req as any).file;
+
+        if (size > 2 * 1024 * 1024) {
+          
+          res.status(400).json({ Error: "Não foi possível criar o registro na base de dados!" })
+        } else {
+          console.log('Buffer e mimetype:', req.file!);
+          const imageUploadObject = {
+            name,
+            size,
+            key,
+            url: '',
+            path,
+            file: { 
+              data: req.file!.buffer, 
+              contentType: req.file!.mimetype
+            },
+            
+          }
+      
+          const postImage = new Image(imageUploadObject);
+          await postImage.save();
+      
+          res.json({ buffer, mimetype});
+        }
+    } catch (error) {
+      res
+        .status(500)
+        .json({ Error: "Não foi possível criar o registro na base de dados!" });
+      next();
+    }
+  },
+
   async showAllSeries(
     req: Request,
     res: Response,
@@ -36,6 +77,22 @@ const SeriesController = {
       const { page = 1 }: any = req.query;
       const series = await Series.find({ uid: req.params.uid });
       res.json(series);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ Error: "Não foi possível trazer os registros solicitados!" });
+      next();
+    }
+  },
+
+  async showAllImages(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const imagePath = await Image.find({ name: req.params.name });
+      res.json(imagePath);
     } catch (error) {
       res
         .status(500)
