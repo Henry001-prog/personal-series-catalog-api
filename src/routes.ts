@@ -19,7 +19,7 @@ const protectedApi = Router();
 protectedApi.use(auth);
 
 routes.post('/api/series', protectedApi, SeriesController.createSeries);
-routes.post('/api/:img', upload.single('image'), SeriesController.createSeriesImage);
+routes.post('/api/img', upload.single('image'), SeriesController.createSeriesImage);
 routes.get('/api/img/:key', SeriesController.showAllImages);
 routes.get('/api/series/:uid', protectedApi, SeriesController.showAllSeries);
 routes.get('/api/series/:uid/:id', protectedApi, SeriesController.showSeries);
