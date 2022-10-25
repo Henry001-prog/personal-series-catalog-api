@@ -6,7 +6,7 @@ import { User } from "../models/User";
 import { ObjectId } from "mongoose";
 import crypto from "crypto";
 
-const uid = crypto.randomBytes(16).toString("hex");
+
 
 interface IUser {
   _id: ObjectId;
@@ -39,7 +39,7 @@ const login = (req: Request, res: Response, next: NextFunction): void => {
       const { email }: IUser = user;
       res.json({ email, token });
     } else {
-      return res.status(400).send({ errors: ["Usuário/Senha inválidos"] });
+      return res.status(401).send({ errors: ["Usuário/Senha inválidos"] });
     }
   });
 };
@@ -67,11 +67,11 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const confirmPassword: string = req.body.confirm_password || "";
 
   if (!email.match(emailRegex)) {
-    return res.status(400).send({ errors: ["O e-mail informado está inválido"] });
+    return res.status(402).send({ errors: ["O e-mail informado está inválido"] });
   }
 
   if (!password.match(passwordRegex)) {
-    return res.status(400).send({
+    return res.status(403).send({
       errors: [
         "Senha precisar ter: uma letra maiúscula, uma letra minúscula, um número, um caractere especial(@#$%) e tamanho entre 6-20.",
       ],
@@ -81,16 +81,18 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const salt = bcryptjs.genSaltSync();
   const passwordHash: string = bcryptjs.hashSync(password, salt);
   if (!bcryptjs.compareSync(confirmPassword, passwordHash)) {
-    return res.status(400).send({ errors: ["Senhas não conferem."] });
+    return res.status(405).send({ errors: ["Senhas não conferem."] });
   }
 
   User.findOne({ email }, (err: any, user: IUser) => {
     if (err) {
       return sendErrorsFromDB(res, err);
     } else if (user) {
-      return res.status(400).send({ errors: ["Usuário já cadastrado."] });
+      return res.status(403).send({ errors: ["Usuário já cadastrado."] });
     } else {
+      const uid = crypto.randomBytes(16).toString("hex");
       const newUser = new User({ email, password: passwordHash, uid });
+      console.log('new user: ', newUser);
       newUser.save((err) => {
         if (err) {
           return sendErrorsFromDB(res, err);
