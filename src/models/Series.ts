@@ -10,7 +10,7 @@ interface ISeries extends Document {
     gender: string;
     rate: number;
     description: string;
-    createdAt: Number;
+    createdAt: Date;
   };
 }
 
@@ -46,6 +46,10 @@ const SeriesSchema = new Schema<ISeries>({
     description: {
       type: String,
       required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
 });

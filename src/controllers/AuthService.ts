@@ -34,7 +34,7 @@ const login = (req: Request, res: Response, next: NextFunction): void => {
       return sendErrorsFromDB(res, err);
     } else if (user && bcryptjs.compareSync(password, user.password)) {
       const token: string = jwt.sign(user.toJSON(), process.env.AUTH_SECRET, {
-        expiresIn: "5 day",
+        expiresIn: "5 days",
       });
       const { email }: IUser = user;
       res.json({ email, token });
@@ -67,7 +67,7 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const confirmPassword: string = req.body.confirm_password || "";
 
   if (!email.match(emailRegex)) {
-    return res.status(402).send({ errors: ["O e-mail informado está inválido"] });
+    return res.status(401).send({ errors: ["O e-mail informado está inválido"] });
   }
 
   if (!password.match(passwordRegex)) {
@@ -81,7 +81,7 @@ const signup = (req: Request, res: Response, next: NextFunction) => {
   const salt = bcryptjs.genSaltSync();
   const passwordHash: string = bcryptjs.hashSync(password, salt);
   if (!bcryptjs.compareSync(confirmPassword, passwordHash)) {
-    return res.status(405).send({ errors: ["Senhas não conferem."] });
+    return res.status(401).send({ errors: ["Senhas não conferem."] });
   }
 
   User.findOne({ email }, (err: any, user: IUser) => {
